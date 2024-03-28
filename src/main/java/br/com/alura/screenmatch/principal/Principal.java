@@ -51,12 +51,17 @@ public class Principal {
                 .flatMap(t -> t.episodeos().stream())
                 .collect(Collectors.toList());
 
-        System.out.println("\nTop 5 episodeos: ");
-        dadosEpisodeos.stream()
-                .filter(e -> !e.avaliacao().equals("N/A"))
-                .sorted(Comparator.comparing(DadosEpisodeo::avaliacao).reversed())
-                .limit(5)
-                .forEach(System.out::println);
+//        System.out.println("\nTop 10 episodeos: ");
+//        dadosEpisodeos.stream()
+//                .filter(e -> !e.avaliacao().equals("N/A"))
+//                .peek(e -> System.out.println("Primeiro filtro N/A: " + e))
+//                .sorted(Comparator.comparing(DadosEpisodeo::avaliacao).reversed())
+//                .peek(e -> System.out.println("Ordenação: " + e))
+//                .limit(10)
+//                .peek(e -> System.out.println("Limite: " + e))
+//                .map(e -> e.titulo().toUpperCase())
+//                .peek(e -> System.out.println("Mapeamento: " + e))
+//                .forEach(System.out::println);
 
         List<Episodeo> episodeos = temporadas.stream()
                 .flatMap(t -> t.episodeos()
@@ -66,22 +71,50 @@ public class Principal {
 
         episodeos.forEach(System.out::println);
 
-        System.out.println("A partir de que ano você deseja ver os episódeos? ");
-        var ano = scanner.nextInt();
-        scanner.nextLine();
+//        System.out.println("Procure por um titulo: ");
+//        var trechoTitulo = scanner.nextLine();
+//
+//        Optional<Episodeo> episodeoBuscado = episodeos.stream()
+//                .filter(e -> e.getTitulo().toUpperCase().contains(trechoTitulo.toUpperCase()))
+//                .findFirst();
+//
+//        if (episodeoBuscado.isPresent()) {
+//            System.out.println("Episódeo encontrado");
+//            System.out.println("Temporada: " + episodeoBuscado.get().getTemporada());
+//        } else {
+//            System.out.println("Episódeo não encontrado");
+//        }
+//
+//        System.out.println("A partir de que ano você deseja ver os episódeos? ");
+//        var ano = scanner.nextInt();
+//        scanner.nextLine();
+//
+//        LocalDate dataBusca = LocalDate.of(ano, 1, 1);
+//
+//        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//
+//        episodeos.stream()
+//                .filter(e -> e.getDataLancamento() != null
+//                        && e.getDataLancamento().isAfter(dataBusca))
+//                .forEach(e -> System.out.println(
+//                        "Temporada: " + e.getTemporada() +
+//                        " Episódeo: " + e.getTitulo() +
+//                        " Data lançamento: " + e.getDataLancamento().format(formatador)
+//                ));
 
-        LocalDate dataBusca = LocalDate.of(ano, 1, 1);
+        Map<Integer, Double> avaliacoesPorTemporada = episodeos.stream()
+                .filter(e -> e.getAvaliacao() > 0.0)
+                .collect(Collectors.groupingBy(Episodeo::getTemporada,
+                        Collectors.averagingDouble(Episodeo::getAvaliacao)));
+        System.out.println(avaliacoesPorTemporada);
 
-        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-        episodeos.stream()
-                .filter(e -> e.getDataLancamento() != null
-                        && e.getDataLancamento().isAfter(dataBusca))
-                .forEach(e -> System.out.println(
-                        "Temporada: " + e.getTemporada() +
-                        " Episódeo: " + e.getTitulo() +
-                        " Data lançamento: " + e.getDataLancamento().format(formatador)
-                ));
+        DoubleSummaryStatistics est = episodeos.stream()
+                .filter(e -> e.getAvaliacao() > 0.0)
+                .collect(Collectors.summarizingDouble(Episodeo::getAvaliacao));
+        System.out.println("média: " + est.getAverage());
+        System.out.println("Melhor episódeo: " + est.getMax());
+        System.out.println("Pior episódeo: " + est.getMin());
+        System.out.println("Quantidade: " + est.getCount());
 
     }
 }
