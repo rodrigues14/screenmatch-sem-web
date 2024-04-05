@@ -18,6 +18,8 @@ public class Principal {
     private List<Serie> series = new ArrayList<>();
     private SerieRepository repositorio;
 
+    private Optional<Serie> serieBusca;
+
     public Principal(SerieRepository repositorio) {
         this.repositorio = repositorio;
     }
@@ -27,13 +29,16 @@ public class Principal {
         while (opcao != 0) {
             var menu = """
                     1 - Buscar séries
-                    2 - Buscar Episódeos
+                    2 - Buscar Episódios
                     3 - Listar séries
                     4 - Buscar série por título
                     5 - Buscar séries por ator
                     6 - Top 5 séries
                     7 - Buscar séries por categoria
                     8 - Buscar séries pela quantidade de temporadas e avaliação
+                    9 - Buscar episódio por trecho
+                    10 - Top 5 episódios por série
+                    11 - Buscar episódios a partir de uma data
                                     
                     0 - Sair
                     """;
@@ -66,6 +71,15 @@ public class Principal {
                     break;
                 case 8:
                     buscarSeriePorQuantidadeDeTemporadaEnota();
+                    break;
+                case 9:
+                    buscarEpisodioPorTrecho();
+                    break;
+                case 10:
+                    topEpisodiosPorSerie();
+                    break;
+                case 11:
+                    buscarEpisodioDepoisDeUmaData();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -112,12 +126,12 @@ public class Principal {
             }
             temporadas.forEach(System.out::println);
 
-            List<Episodeo> episodeos = temporadas.stream()
-                    .flatMap(d -> d.episodeos().stream()
-                            .map(e -> new Episodeo(d.numero(), e)))
+            List<Episodio> episodios = temporadas.stream()
+                    .flatMap(d -> d.episodios().stream()
+                            .map(e -> new Episodio(d.numero(), e)))
                     .collect(Collectors.toList());
 
-            serieEncontrada.setEpisodeos(episodeos);
+            serieEncontrada.setEpisodios(episodios);
             repositorio.save(serieEncontrada);
 
         } else {
@@ -135,10 +149,10 @@ public class Principal {
     private void buscarSeriePorTitulo() {
         System.out.println("Escolha uma série pelo nome");
         var nomeSerie = scanner.nextLine();
-        Optional<Serie> serie = repositorio.findByTituloContainingIgnoreCase(nomeSerie);
+        serieBusca = repositorio.findByTituloContainingIgnoreCase(nomeSerie);
 
-        if (serie.isPresent()) {
-            System.out.println("Dados da série: " + serie.get());
+        if (serieBusca.isPresent()) {
+            System.out.println("Dados da série: " + serieBusca.get());
         } else {
             System.out.println("Série não encontrada!");
         }
@@ -170,13 +184,44 @@ public class Principal {
 
     private void buscarSeriePorQuantidadeDeTemporadaEnota() {
         System.out.println("Quer séries até quantas temporadas?");
-        var maximoTemporadas = scanner.nextInt();
+        var totalTemporadas = scanner.nextInt();
         System.out.println("Com avaliação a partir de: ");
         var avaliacao = scanner.nextDouble();
-        List<Serie> series = repositorio.findByTotalTemporadasLessThanEqualAndAvaliacaoGreaterThanEqual(maximoTemporadas, avaliacao);
+        List<Serie> series = repositorio.seriesPorTemporadaEAvaliacao(totalTemporadas, avaliacao);
         System.out.println("Resultado: ");
         series.forEach(s -> System.out.println("Nome: " + s.getTitulo()
                 + ", Temporadas: " + s.getTotalTemporadas()
                 + ", Avaliação: " + s.getAvaliacao()));
+    }
+
+    private void buscarEpisodioPorTrecho() {
+        System.out.println("Qual o nome do episódio para a busca?");
+        var trechoEpisodio = scanner.nextLine();
+        List<Episodio> episodiosEncontrados = repositorio.episodiosPorTrecho(trechoEpisodio);
+        episodiosEncontrados.forEach(e -> System.out.println(
+                "Série: " + e.getSerie().getTitulo()+ ", " + e
+        ));
+    }
+
+    public void topEpisodiosPorSerie() {
+        buscarSeriePorTitulo();
+        Serie serie = serieBusca.get();
+        List<Episodio> topEpisodios = repositorio.topEpisodiosPorSerie(serie);
+        topEpisodios.forEach(e -> System.out.println(
+                "Série: " + e.getSerie().getTitulo()+ ", " + e
+        ));
+    }
+
+    private void buscarEpisodioDepoisDeUmaData() {
+        buscarSeriePorTitulo();
+        if (serieBusca.isPresent()) {
+            Serie serie = serieBusca.get();
+            System.out.println("Digite o ano limite do lançamento");
+            var anoLancamento = scanner.nextInt();
+            scanner.nextLine();
+
+            List<Episodio> episodioAno = repositorio.episodiosPorSerieEAno(serie, anoLancamento);
+            episodioAno.forEach(System.out::println);
+        }
     }
 }

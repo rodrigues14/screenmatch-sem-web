@@ -1,7 +1,5 @@
 package br.com.alura.screenmatch.model;
 
-import br.com.alura.screenmatch.service.ConsultaChatGPT;
-import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -24,7 +22,7 @@ public class Serie {
     private String atores;
     private String sinopse;
     @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Episodeo> episodeos = new ArrayList<>();
+    private List<Episodio> episodios = new ArrayList<>();
 
     public Serie() {
     }
@@ -104,13 +102,13 @@ public class Serie {
         this.sinopse = sinopse;
     }
 
-    public List<Episodeo> getEpisodeos() {
-        return episodeos;
+    public List<Episodio> getEpisodios() {
+        return episodios;
     }
 
-    public void setEpisodeos(List<Episodeo> episodeos) {
-        episodeos.forEach(e -> e.setSerie(this));
-        this.episodeos = episodeos;
+    public void setEpisodios(List<Episodio> episodios) {
+        episodios.forEach(e -> e.setSerie(this));
+        this.episodios = episodios;
     }
 
 
@@ -123,6 +121,6 @@ public class Serie {
                 ", poster='" + poster + '\'' +
                 ", atores='" + atores + '\'' +
                 ", sinopse='" + sinopse + '\'' +
-                ", episódeos='" + episodeos + '\'';
+                ", episódeos='" + episodios + '\'';
     }
 }

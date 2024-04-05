@@ -6,33 +6,33 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "episodeos")
-public class Episodeo {
+@Table(name = "episodios")
+public class Episodio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Integer temporada;
     private String titulo;
-    private Integer numeroEpisodeo;
+    private Integer numeroEpisodio;
     private Double avaliacao;
     private LocalDate dataLancamento;
     @ManyToOne
     private Serie serie;
 
-    public Episodeo() {
+    public Episodio() {
     }
 
-    public Episodeo(Integer numeroTemporada, DadosEpisodeo dadosEpisodeo) {
+    public Episodio(Integer numeroTemporada, DadosEpisodio dadosEpisodio) {
         this.temporada = numeroTemporada;
-        this.titulo = dadosEpisodeo.titulo();
-        this.numeroEpisodeo = dadosEpisodeo.numero();
+        this.titulo = dadosEpisodio.titulo();
+        this.numeroEpisodio = dadosEpisodio.numero();
         try {
-            this.avaliacao = Double.valueOf(dadosEpisodeo.avaliacao());
+            this.avaliacao = Double.valueOf(dadosEpisodio.avaliacao());
         } catch (NumberFormatException e) {
             this.avaliacao = 0.0;
         }
         try {
-            this.dataLancamento = LocalDate.parse(dadosEpisodeo.dataLancamento());
+            this.dataLancamento = LocalDate.parse(dadosEpisodio.dataLancamento());
         } catch (DateTimeException e) {
             this.dataLancamento = null;
         }
@@ -63,12 +63,12 @@ public class Episodeo {
         this.titulo = titulo;
     }
 
-    public Integer getNumeroEpisodeo() {
-        return numeroEpisodeo;
+    public Integer getNumeroEpisodio() {
+        return numeroEpisodio;
     }
 
-    public void setNumeroEpisodeo(Integer numeroEpisodeo) {
-        this.numeroEpisodeo = numeroEpisodeo;
+    public void setNumeroEpisodio(Integer numeroEpisodio) {
+        this.numeroEpisodio = numeroEpisodio;
     }
 
     public Double getAvaliacao() {
@@ -99,7 +99,7 @@ public class Episodeo {
     public String toString() {
         return "temporada=" + temporada +
                 ", titulo='" + titulo + '\'' +
-                ", numeroEpisodeo=" + numeroEpisodeo +
+                ", numeroEpisodio=" + numeroEpisodio +
                 ", avaliacao=" + avaliacao +
                 ", dataLancamento=" + dataLancamento;
     }
