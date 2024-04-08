@@ -1,5 +1,6 @@
 package br.com.alura.screenmatch.model;
 
+import br.com.alura.screenmatch.dto.SerieDTO;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class Serie {
     @Column(unique = true)
     private String titulo;
     private Integer totalTemporadas;
-    private double avaliacao;
+    private Double avaliacao;
     private String poster;
     @Enumerated(EnumType.STRING)
     private Categoria genero;
